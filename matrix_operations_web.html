@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Operations Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .matrix-input {
+            margin-bottom: 20px;
+        }
+
+        .matrix-input label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .dimension-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .dimension-inputs input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .operations-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .operation-btn {
+            padding: 15px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .operation-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .result-panel {
+            grid-column: 1 / -1;
+        }
+
+        .matrix-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .matrix-display h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .matrix-table {
+            display: inline-block;
+            border-left: 3px solid #333;
+            border-right: 3px solid #333;
+            padding: 10px 15px;
+        }
+
+        .matrix-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 5px 0;
+        }
+
+        .matrix-cell {
+            padding: 5px 15px;
+            text-align: right;
+            min-width: 80px;
+        }
+
+        .info-box {
+            background: #e0e7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        .error {
+            background: #fee;
+            border-left-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .success {
+            background: #d1fae5;
+            border-left-color: #10b981;
+            color: #059669;
+        }
+
+        .quick-examples {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .example-btn {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .example-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .operations-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔢 Matrix Operations Tool</h1>
+            <p>Powered by JavaScript & NumPy-style Operations | Interactive Calculator</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Matrix A Input -->
+            <div class="panel">
+                <h2>📊 Matrix A</h2>
+                <div class="matrix-input">
+                    <label>Matrix Dimensions:</label>
+                    <div class="dimension-inputs">
+                        <input type="number" id="rowsA" placeholder="Rows" value="3" min="1" max="10">
+                        <input type="number" id="colsA" placeholder="Columns" value="3" min="1" max="10">
+                    </div>
+                    <label>Enter Matrix Values (space-separated, row by row):</label>
+                    <textarea id="matrixA" placeholder="Example:
+1 2 3
+4 5 6
+7 8 9">1 2 3
+4 5 6
+7 8 9</textarea>
+                    <div class="quick-examples">
+                        <button class="example-btn" onclick="loadExample('A', 'identity')">Identity</button>
+                        <button class="example-btn" onclick="loadExample('A', 'random')">Random</button>
+                        <button class="example-btn" onclick="loadExample('A', 'zero')">Zero</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matrix B Input -->
+            <div class="panel">
+                <h2>📊 Matrix B</h2>
+                <div class="matrix-input">
+                    <label>Matrix Dimensions:</label>
+                    <div class="dimension-inputs">
+                        <input type="number" id="rowsB" placeholder="Rows" value="3" min="1" max="10">
+                        <input type="number" id="colsB" placeholder="Columns" value="3" min="1" max="10">
+                    </div>
+                    <label>Enter Matrix Values (space-separated, row by row):</label>
+                    <textarea id="matrixB" placeholder="Example:
+9 8 7
+6 5 4
+3 2 1">9 8 7
+6 5 4
+3 2 1</textarea>
+                    <div class="quick-examples">
+                        <button class="example-btn" onclick="loadExample('B', 'identity')">Identity</button>
+                        <button class="example-btn" onclick="loadExample('B', 'random')">Random</button>
+                        <button class="example-btn" onclick="loadExample('B', 'zero')">Zero</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operations Panel -->
+            <div class="panel result-panel">
+                <h2>⚙️ Operations</h2>
+                
+                <h3 style="color: #666; margin-bottom: 10px;">Two Matrix Operations:</h3>
+                <div class="operations-grid">
+                    <button class="operation-btn" onclick="performOperation('add')">➕ Add (A + B)</button>
+                    <button class="operation-btn" onclick="performOperation('subtract')">➖ Subtract (A - B)</button>
+                    <button class="operation-btn" onclick="performOperation('multiply')">✖️ Multiply (A × B)</button>
+                    <button class="operation-btn" onclick="performOperation('elementwise')">⊙ Element-wise</button>
+                </div>
+
+                <h3 style="color: #666; margin: 20px 0 10px 0;">Single Matrix Operations:</h3>
+                <div class="operations-grid">
+                    <button class="operation-btn" onclick="performOperation('transpose')">↔️ Transpose</button>
+                    <button class="operation-btn" onclick="performOperation('determinant')">|A| Determinant</button>
+                    <button class="operation-btn" onclick="performOperation('inverse')">A⁻¹ Inverse</button>
+                    <button class="operation-btn" onclick="performOperation('trace')">Tr Trace</button>
+                    <button class="operation-btn" onclick="performOperation('rank')">📊 Rank</button>
+                    <button class="operation-btn" onclick="performOperation('power')">Aⁿ Power</button>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn-success" onclick="parseMatrices()">✓ Validate Matrices</button>
+                    <button class="btn-secondary" onclick="clearResults()">🗑️ Clear Results</button>
+                    <button class="btn-secondary" onclick="swapMatrices()">⇄ Swap A ↔ B</button>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="panel result-panel">
+                <h2>📋 Results</h2>
+                <div id="resultContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Matrix class for operations
+        class Matrix {
+            constructor(data) {
+                this.data = data;
+                this.rows = data.length;
+                this.cols = data[0].length;
+            }
+
+            static fromString(str, rows, cols) {
+                const lines = str.trim().split('\n');
+                const data = [];
+                
+                for (let i = 0; i < rows; i++) {
+                    if (i < lines.length) {
+                        const row = lines[i].trim().split(/\s+/).map(Number);
+                        if (row.length !== cols) {
+                            throw new Error(`Row ${i + 1} has ${row.length} elements, expected ${cols}`);
+                        }
+                        data.push(row);
+                    } else {
+                        throw new Error(`Missing row ${i + 1}`);
+                    }
+                }
+                
+                return new Matrix(data);
+            }
+
+            add(other) {
+                if (this.rows !== other.rows || this.cols !== other.cols) {
+                    throw new Error('Matrix dimensions must match for addition');
+                }
+                
+                const result = [];
+                for (let i = 0; i < this.rows; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < this.cols; j++) {
+                        result[i][j] = this.data[i][j] + other.data[i][j];
+                    }
+                }
+                return new Matrix(result);
+            }
+
+            subtract(other) {
+                if (this.rows !== other.rows || this.cols !== other.cols) {
+                    throw new Error('Matrix dimensions must match for subtraction');
+                }
+                
+                const result = [];
+                for (let i = 0; i < this.rows; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < this.cols; j++) {
+                        result[i][j] = this.data[i][j] - other.data[i][j];
+                    }
+                }
+                return new Matrix(result);
+            }
+
+            multiply(other) {
+                if (this.cols !== other.rows) {
+                    throw new Error(`Cannot multiply ${this.rows}×${this.cols} by ${other.rows}×${other.cols}`);
+                }
+                
+                const result = [];
+                for (let i = 0; i < this.rows; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < other.cols; j++) {
+                        let sum = 0;
+                        for (let k = 0; k < this.cols; k++) {
+                            sum += this.data[i][k] * other.data[k][j];
+                        }
+                        result[i][j] = sum;
+                    }
+                }
+                return new Matrix(result);
+            }
+
+            elementWise(other) {
+                if (this.rows !== other.rows || this.cols !== other.cols) {
+                    throw new Error('Matrix dimensions must match for element-wise multiplication');
+                }
+                
+                const result = [];
+                for (let i = 0; i < this.rows; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < this.cols; j++) {
+                        result[i][j] = this.data[i][j] * other.data[i][j];
+                    }
+                }
+                return new Matrix(result);
+            }
+
+            transpose() {
+                const result = [];
+                for (let j = 0; j < this.cols; j++) {
+                    result[j] = [];
+                    for (let i = 0; i < this.rows; i++) {
+                        result[j][i] = this.data[i][j];
+                    }
+                }
+                return new Matrix(result);
+            }
+
+            determinant() {
+                if (this.rows !== this.cols) {
+                    throw new Error('Determinant requires square matrix');
+                }
+                
+                return this.calculateDeterminant(this.data);
+            }
+
+            calculateDeterminant(matrix) {
+                const n = matrix.length;
+                
+                if (n === 1) return matrix[0][0];
+                if (n === 2) {
+                    return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+                }
+                
+                let det = 0;
+                for (let j = 0; j < n; j++) {
+                    const minor = this.getMinor(matrix, 0, j);
+                    det += Math.pow(-1, j) * matrix[0][j] * this.calculateDeterminant(minor);
+                }
+                return det;
+            }
+
+            getMinor(matrix, row, col) {
+                return matrix
+                    .filter((_, i) => i !== row)
+                    .map(r => r.filter((_, j) => j !== col));
+            }
+
+            inverse() {
+                if (this.rows !== this.cols) {
+                    throw new Error('Inverse requires square matrix');
+                }
+                
+                const det = this.determinant();
+                if (Math.abs(det) < 1e-10) {
+                    throw new Error('Matrix is singular (determinant = 0)');
+                }
+                
+                const n = this.rows;
+                const adjugate = [];
+                
+                for (let i = 0; i < n; i++) {
+                    adjugate[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        const minor = this.getMinor(this.data, i, j);
+                        const cofactor = Math.pow(-1, i + j) * this.calculateDeterminant(minor);
+                        adjugate[i][j] = cofactor;
+                    }
+                }
+                
+                // Transpose adjugate and divide by determinant
+                const result = [];
+                for (let i = 0; i < n; i++) {
+                    result[i] = [];
+                    for (let j = 0; j < n; j++) {
+                        result[i][j] = adjugate[j][i] / det;
+                    }
+                }
+                
+                return new Matrix(result);
+            }
+
+            trace() {
+                if (this.rows !== this.cols) {
+                    throw new Error('Trace requires square matrix');
+                }
+                
+                let sum = 0;
+                for (let i = 0; i < this.rows; i++) {
+                    sum += this.data[i][i];
+                }
+                return sum;
+            }
+
+            rank() {
+                // Simple rank calculation using row reduction
+                const matrix = this.data.map(row => [...row]);
+                let rank = 0;
+                const epsilon = 1e-10;
+                
+                for (let col = 0; col < Math.min(this.rows, this.cols); col++) {
+                    // Find pivot
+                    let pivotRow = -1;
+                    for (let row = rank; row < this.rows; row++) {
+                        if (Math.abs(matrix[row][col]) > epsilon) {
+                            pivotRow = row;
+                            break;
+                        }
+                    }
+                    
+                    if (pivotRow === -1) continue;
+                    
+                    // Swap rows
+                    if (pivotRow !== rank) {
+                        [matrix[rank], matrix[pivotRow]] = [matrix[pivotRow], matrix[rank]];
+                    }
+                    
+                    // Eliminate
+                    for (let row = rank + 1; row < this.rows; row++) {
+                        const factor = matrix[row][col] / matrix[rank][col];
+                        for (let c = col; c < this.cols; c++) {
+                            matrix[row][c] -= factor * matrix[rank][c];
+                        }
+                    }
+                    
+                    rank++;
+                }
+                
+                return rank;
+            }
+
+            power(n) {
+                if (this.rows !== this.cols) {
+                    throw new Error('Matrix power requires square matrix');
+                }
+                
+                if (n === 0) {
+                    return Matrix.identity(this.rows);
+                }
+                
+                if (n === 1) {
+                    return new Matrix(this.data.map(row => [...row]));
+                }
+                
+                let result = new Matrix(this.data.map(row => [...row]));
+                for (let i = 1; i < n; i++) {
+                    result = result.multiply(this);
+                }
+                return result;
+            }
+
+            static identity(size) {
+                const data = [];
+                for (let i = 0; i < size; i++) {
+                    data[i] = [];
+                    for (let j = 0; j < size; j++) {
+                        data[i][j] = i === j ? 1 : 0;
+                    }
+                }
+                return new Matrix(data);
+            }
+
+            static random(rows, cols, min = 0, max = 10) {
+                const data = [];
+                for (let i = 0; i < rows; i++) {
+                    data[i] = [];
+                    for (let j = 0; j < cols; j++) {
+                        data[i][j] = Math.floor(Math.random() * (max - min + 1)) + min;
+                    }
+                }
+                return new Matrix(data);
+            }
+
+            static zero(rows, cols) {
+                const data = [];
+                for (let i = 0; i < rows; i++) {
+                    data[i] = new Array(cols).fill(0);
+                }
+                return new Matrix(data);
+            }
+
+            toHTML() {
+                let html = '<div class="matrix-table">';
+                for (let i = 0; i < this.rows; i++) {
+                    html += '<div class="matrix-row">';
+                    for (let j = 0; j < this.cols; j++) {
+                        const value = this.data[i][j];
+                        const formatted = Math.abs(value) < 1e-10 ? '0' : 
+                                        (Number.isInteger(value) ? value : value.toFixed(4));
+                        html += `<div class="matrix-cell">${formatted}</div>`;
+                    }
+                    html += '</div>';
+                }
+                html += '</div>';
+                return html;
+            }
+        }
+
+        let matrixA, matrixB;
+
+        function parseMatrices() {
+            const resultContainer = document.getElementById('resultContainer');
+            
+            try {
+                const rowsA = parseInt(document.getElementById('rowsA').value);
+                const colsA = parseInt(document.getElementById('colsA').value);
+                const rowsB = parseInt(document.getElementById('rowsB').value);
+                const colsB = parseInt(document.getElementById('colsB').value);
+                
+                matrixA = Matrix.fromString(document.getElementById('matrixA').value, rowsA, colsA);
+                matrixB = Matrix.fromString(document.getElementById('matrixB').value, rowsB, colsB);
+                
+                resultContainer.innerHTML = `
+                    <div class="info-box success">
+                        <strong>✓ Matrices validated successfully!</strong><br>
+                        Matrix A: ${matrixA.rows}×${matrixA.cols}<br>
+                        Matrix B: ${matrixB.rows}×${matrixB.cols}
+                    </div>
+                `;
+                
+                return true;
+            } catch (error) {
+                resultContainer.innerHTML = `
+                    <div class="info-box error">
+                        <strong>✗ Validation Error:</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+                return false;
+            }
+        }
+
+        function performOperation(operation) {
+            if (!parseMatrices()) return;
+            
+            const resultContainer = document.getElementById('resultContainer');
+            let resultHTML = '';
+            
+            try {
+                let result, title, info;
+                
+                switch(operation) {
+                    case 'add':
+                        result = matrixA.add(matrixB);
+                        title = 'Matrix Addition (A + B)';
+                        info = `Added ${matrixA.rows}×${matrixA.cols} matrices`;
+                        break;
+                    
+                    case 'subtract':
+                        result = matrixA.subtract(matrixB);
+                        title = 'Matrix Subtraction (A - B)';
+                        info = `Subtracted ${matrixA.rows}×${matrixA.cols} matrices`;
+                        break;
+                    
+                    case 'multiply':
+                        result = matrixA.multiply(matrixB);
+                        title = 'Matrix Multiplication (A × B)';
+                        info = `Multiplied ${matrixA.rows}×${matrixA.cols} by ${matrixB.rows}×${matrixB.cols} = ${result.rows}×${result.cols}`;
+                        break;
+                    
+                    case 'elementwise':
+                        result = matrixA.elementWise(matrixB);
+                        title = 'Element-wise Multiplication (A ⊙ B)';
+                        info = `Element-wise product of ${matrixA.rows}×${matrixA.cols} matrices`;
+                        break;
+                    
+                    case 'transpose':
+                        result = matrixA.transpose();
+                        title = 'Transpose of Matrix A (Aᵀ)';
+                        info = `Transposed ${matrixA.rows}×${matrixA.cols} to ${result.rows}×${result.cols}`;
+                        break;
+                    
+                    case 'determinant':
+                        const det = matrixA.determinant();
+                        resultHTML = `
+                            <div class="matrix-display">
+                                <h3>${title || 'Determinant of Matrix A (|A|)'}</h3>
+                                <div class="info-box">
+                                    <strong>Determinant:</strong> ${det.toFixed(6)}
+                                </div>
+                                <div class="info-box">
+                                    Matrix A (${matrixA.rows}×${matrixA.cols})
+                                </div>
+                                ${matrixA.toHTML()}
+                            </div>
+                        `;
+                        resultContainer.innerHTML = resultHTML;
+                        return;
+                    
+                    case 'inverse':
+                        result = matrixA.inverse();
+                        title = 'Inverse of Matrix A (A⁻¹)';
+                        info = `Calculated inverse of ${matrixA.rows}×${matrixA.cols} matrix`;
+                        
+                        // Verify with A × A⁻¹ = I
+                        const identity = matrixA.multiply(result);
+                        resultHTML = `
+                            <div class="matrix-display">
+                                <h3>${title}</h3>
+                                <div class="info-box">
+                                    ${info}<br>
+                                    Determinant: ${matrixA.determinant().toFixed(6)}
+                                </div>
+                                <h4>A⁻¹ =</h4>
+                                ${result.toHTML()}
+                                <div class="info-box success" style="margin-top: 15px;">
+                                    <strong>Verification: A × A⁻¹ =</strong>
+                                </div>
+                                ${identity.toHTML()}
+                            </div>
+                        `;
+                        resultContainer.innerHTML = resultHTML;
+                        return;
+                    
+                    case 'trace':
+                        const trace = matrixA.trace();
+                        resultHTML = `
+                            <div class="matrix-display">
+                                <h3>Trace of Matrix A (Tr(A))</h3>
+                                <div class="info-box">
+                                    <strong>Trace:</strong> ${trace.toFixed(6)}<br>
+                                    (Sum of diagonal elements)
+                                </div>
+                                <div class="info-box">
+                                    Matrix A (${matrixA.rows}×${matrixA.cols})
+                                </div>
+                                ${matrixA.toHTML()}
+                            </div>
+                        `;
+                        resultContainer.innerHTML = resultHTML;
+                        return;
+                    
+                    case 'rank':
+                        const rank = matrixA.rank();
+                        resultHTML = `
+                            <div class="matrix-display">
+                                <h3>Rank of Matrix A</h3>
+                                <div class="info-box">
+                                    <strong>Rank:</strong> ${rank}<br>
+                                    (Number of linearly independent rows/columns)
+                                </div>
+                                <div class="info-box">
+                                    Matrix A (${matrixA.rows}×${matrixA.cols})
+                                </div>
+                                ${matrixA.toHTML()}
+                            </div>
+                        `;
+                        resultContainer.innerHTML = resultHTML;
+                        return;
+                    
+                    case 'power':
+                        const power = prompt('Enter power (positive integer):', '2');
+                        if (!power) return;
+                        const n = parseInt(power);
+                        if (isNaN(n) || n < 0) {
+                            throw new Error('Power must be a non-negative integer');
+                        }
+                        result = matrixA.power(n);
+                        title = `Matrix A to Power ${n} (A${n > 1 ? '⁰¹²³⁴⁵⁶⁷⁸⁹'[n] || '^'+n : ''})`;
+                        info = `Calculated ${matrixA.rows}×${matrixA.cols} matrix to power ${n}`;
+                        break;
+                }
+                
+                if (result) {
+                    resultHTML = `
+                        <div class="matrix-display">
+                            <h3>${title}</h3>
+                            <div class="info-box success">
+                                ✓ ${info}
+                            </div>
+                            <h4>Result (${result.rows}×${result.cols}):</h4>
+                            ${result.toHTML()}
+                        </div>
+                    `;
+                    resultContainer.innerHTML = resultHTML;
+                }
+                
+            } catch (error) {
+                resultContainer.innerHTML = `
+                    <div class="info-box error">
+                        <strong>✗ Operation Error:</strong><br>
+                        ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function loadExample(matrix, type) {
+            const rowsId = `rows${matrix}`;
+            const colsId = `cols${matrix}`;
+            const textareaId = `matrix${matrix}`;
+            
+            const rows = parseInt(document.getElementById(rowsId).value) || 3;
+            const cols = parseInt(document.getElementById(colsId).value) || 3;
+            
+            let result;
+            
+            switch(type) {
+                case 'identity':
+                    const size = Math.min(rows, cols);
+                    document.getElementById(rowsId).value = size;
+                    document.getElementById(colsId).value = size;
+                    result = Matrix.identity(size);
+                    break;
+                
+                case 'random':
+                    result = Matrix.random(rows, cols, 1, 9);
+                    break;
+                
+                case 'zero':
+                    result = Matrix.zero(rows, cols);
+                    break;
+            }
+            
+            // Convert matrix to textarea format
+            let text = '';
+            for (let i = 0; i < result.rows; i++) {
+                text += result.data[i].join(' ');
+                if (i < result.rows - 1) text += '\n';
+            }
+            
+            document.getElementById(textareaId).value = text;
+        }
+
+        function clearResults() {
+            document.getElementById('resultContainer').innerHTML = '<div class="info-box">No results yet. Perform an operation to see results here.</div>';
+        }
+
+        function swapMatrices() {
+            const tempA = document.getElementById('matrixA').value;
+            const tempRowsA = document.getElementById('rowsA').value;
+            const tempColsA = document.getElementById('colsA').value;
+            
+            document.getElementById('matrixA').value = document.getElementById('matrixB').value;
+            document.getElementById('rowsA').value = document.getElementById('rowsB').value;
+            document.getElementById('colsA').value = document.getElementById('colsB').value;
+            
+            document.getElementById('matrixB').value = tempA;
+            document.getElementById('rowsB').value = tempRowsA;
+            document.getElementById('colsB').value = tempColsA;
+            
+            document.getElementById('resultContainer').innerHTML = '<div class="info-box success">✓ Matrices swapped successfully!</div>';
+        }
+
+        // Initialize
+        clearResults();
+    </script>
+</body>
+</html>
